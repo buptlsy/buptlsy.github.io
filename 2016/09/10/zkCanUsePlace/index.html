@@ -1,0 +1,652 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="java, zk," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="zk是一个高可用的分布式数据管理与协调框架，能很好的解决分布式环境中数据的一致性。
+应用场景zk的应用场景主要在分布式锁、分布式队列、数据发布/订阅、集群管理、master选举、负载均衡和命名服务等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zk使用场景">
+<meta property="og:url" content="http://yoursite.com/2016/09/10/zkCanUsePlace/index.html">
+<meta property="og:site_name" content="大道至简">
+<meta property="og:description" content="zk是一个高可用的分布式数据管理与协调框架，能很好的解决分布式环境中数据的一致性。
+应用场景zk的应用场景主要在分布式锁、分布式队列、数据发布/订阅、集群管理、master选举、负载均衡和命名服务等。">
+<meta property="og:updated_time" content="2016-09-10T07:18:08.691Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="zk使用场景">
+<meta name="twitter:description" content="zk是一个高可用的分布式数据管理与协调框架，能很好的解决分布式环境中数据的一致性。
+应用场景zk的应用场景主要在分布式锁、分布式队列、数据发布/订阅、集群管理、master选举、负载均衡和命名服务等。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/09/10/zkCanUsePlace/"/>
+
+  <title> zk使用场景 | 大道至简 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93c91ab621c82bd1fc32376a4ca10d87";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">大道至简</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                zk使用场景
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-10T11:13:06+08:00" content="2016-09-10">
+              2016-09-10
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/zk/" itemprop="url" rel="index">
+                    <span itemprop="name">zk</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/09/10/zkCanUsePlace/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/10/zkCanUsePlace/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>zk是一个高可用的分布式数据管理与协调框架，能很好的解决分布式环境中数据的一致性。</p>
+<h1 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h1><p>zk的应用场景主要在分布式锁、分布式队列、数据发布/订阅、集群管理、master选举、负载均衡和命名服务等。<br><a id="more"></a></p>
+<h2 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h2><p>zk实现分布式锁，主要有排它锁和共享锁两种分类。</p>
+<h3 id="排它锁"><a href="#排它锁" class="headerlink" title="排它锁"></a>排它锁</h3><p>排它锁只允许同一时间只有一个事务对数据做操作(包括读取和更新操作)。所以排它锁实现的核心是：如何保证当前有且仅有一个事务获得锁，并且锁被释放后，所有正在等待获取锁的事务都能够被通知到。</p>
+<h4 id="实现大体流程"><a href="#实现大体流程" class="headerlink" title="实现大体流程"></a>实现大体流程</h4><p>通过zk上的数据节点来表示一个锁。如/app/lock1。客户端通过调用create()方法在/app下创建节点。因为zk保证只有一个客户端能创建成功，创建成功的客户端便获取了锁。对于没有创建成功的客户端，需要在/app节点下注册一个子节点变更的watcher监听。当创建成功的客户端释放了锁之后，其他的注册了watcher监听的客户端便会接收到通知，再次发起分布式锁获取。</p>
+<h4 id="释放锁"><a href="#释放锁" class="headerlink" title="释放锁"></a>释放锁</h4><p>因为创建的是临时节点，所以释放锁会在下面两种情况下发生：</p>
+<ul>
+<li>客户端所在的机器宕机，那么zk的这个临时节点会被移除</li>
+<li>客户端主动删除自己的临时节点</li>
+</ul>
+<h3 id="共享锁"><a href="#共享锁" class="headerlink" title="共享锁"></a>共享锁</h3><p>共享锁类似于读锁，不同的事务可以同时对同一数据做读取操作，而更新操作时在当前没有任何事务进行读写操作的情况下进行。</p>
+<h4 id="实现大体流程-1"><a href="#实现大体流程-1" class="headerlink" title="实现大体流程"></a>实现大体流程</h4><p>用zk的临时数据节点来表示锁，如/app/127.0.0.1-R-0000001 (hostname-请求类型-序号)。假设所有客户端都在zk /app下创建了临时顺序节点。对于读请求：如果没有比自己小的子节点，或者比自己小的都是读请求，那么自己获取了共享锁，执行读取逻辑。 对于写请求：如果自己不是最小的子节点，进入等待。</p>
+<h3 id="存在的问题（羊群效应）"><a href="#存在的问题（羊群效应）" class="headerlink" title="存在的问题（羊群效应）"></a>存在的问题（羊群效应）</h3><p>在排它锁的实现中，如果一个客户端释放锁，那么会触发所有客户端的watcher事件，而这些客户端通过竞争后只有一个胜出。<br>在共享锁的实现中，如果一个客户端释放锁，其他客户端需要判断自己的读写顺序，也只有一个胜出。</p>
+<h4 id="改进方案"><a href="#改进方案" class="headerlink" title="改进方案"></a>改进方案</h4><p>在添加watcher监听事件时，不需要所所有的客户端都向一个节点注册。watcher监听事件的注册方案是：<br>在共享锁的实现方案中：读请求，向比自己序号小的最后一个写请求节点注册；写请求，向比自己序号小的最后一个节点注册。<br>在排它锁实现方案中：向比自己序号小的节点注册。</p>
+<h2 id="分布式队列"><a href="#分布式队列" class="headerlink" title="分布式队列"></a>分布式队列</h2><p>实现分布式队列的产品比较多，比如ActiceMQ、Kafka、RabbitMq等。分布式队列一种是常规的先进先出队列，另一种是等所有元素汇聚后才统一安排执行的Barrier模型。</p>
+<h3 id="先进先出队列"><a href="#先进先出队列" class="headerlink" title="先进先出队列"></a>先进先出队列</h3><p>类似于排它锁的实现。</p>
+<h3 id="分布式屏障"><a href="#分布式屏障" class="headerlink" title="分布式屏障"></a>分布式屏障</h3><p>类似于jdk 的CountDownLatch, 规定一个队列的元素都聚集后才能统一进行安排，否则一直等待。<br>在/app节点的数据内容赋值为一个数字n，n=10表示此节点下有10个子节点。每个创建子节点的客户端在创建子节点后对/app节点添加watcher监听。如果子节点的个数未达到10个，需要等待。</p>
+<h2 id="数据订阅、发布"><a href="#数据订阅、发布" class="headerlink" title="数据订阅、发布"></a>数据订阅、发布</h2><p>发布者将数据发布到zk的节点上，供订阅者进行数据订阅，进而达到动态获取数据的目的，实现配置信息的集中式管理和数据的动态更新。</p>
+<h3 id="数据特点"><a href="#数据特点" class="headerlink" title="数据特点"></a>数据特点</h3><ul>
+<li>数据量通常比较小</li>
+<li>数据内容在运行时会发生动态变化</li>
+<li>集群中各机器共享，配置一致</li>
+</ul>
+<p>如机器列表信息，运行时的开关配置，数据库的配置。</p>
+<h3 id="配置存储"><a href="#配置存储" class="headerlink" title="配置存储"></a>配置存储</h3><p>新建子节点存储信息</p>
+<h3 id="配置获取"><a href="#配置获取" class="headerlink" title="配置获取"></a>配置获取</h3><p>集群中每台机器在启动阶段，首先会从子节点读取配置信息，同时需要在该配置节点上注册一个数据变更的watcher监听，一旦发生节点数据变更，所有订阅的客户端能够获取到数据变更通知。</p>
+<h3 id="配置变更"><a href="#配置变更" class="headerlink" title="配置变更"></a>配置变更</h3><p>如果需要对节点上的数据进行变更，只需要操作zk即可。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java-zk/" rel="tag">#java, zk</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/04/maven_jar/" rel="next" title="一些解决maven依赖问题的方法">
+                <i class="fa fa-chevron-left"></i> 一些解决maven依赖问题的方法
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/09/10/zkCanUsePlace/"
+           data-title="zk使用场景" data-url="http://yoursite.com/2016/09/10/zkCanUsePlace/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="https://raw.githubusercontent.com/buptlsy/images/gh-pages/suolong.jpg"
+               alt="lsy" />
+          <p class="site-author-name" itemprop="name">lsy</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">17</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#应用场景"><span class="nav-number">1.</span> <span class="nav-text">应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式锁"><span class="nav-number">1.1.</span> <span class="nav-text">分布式锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#排它锁"><span class="nav-number">1.1.1.</span> <span class="nav-text">排它锁</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#实现大体流程"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">实现大体流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#释放锁"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">释放锁</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#共享锁"><span class="nav-number">1.1.2.</span> <span class="nav-text">共享锁</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#实现大体流程-1"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">实现大体流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#存在的问题（羊群效应）"><span class="nav-number">1.1.3.</span> <span class="nav-text">存在的问题（羊群效应）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#改进方案"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">改进方案</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式队列"><span class="nav-number">1.2.</span> <span class="nav-text">分布式队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#先进先出队列"><span class="nav-number">1.2.1.</span> <span class="nav-text">先进先出队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式屏障"><span class="nav-number">1.2.2.</span> <span class="nav-text">分布式屏障</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据订阅、发布"><span class="nav-number">1.3.</span> <span class="nav-text">数据订阅、发布</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据特点"><span class="nav-number">1.3.1.</span> <span class="nav-text">数据特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置存储"><span class="nav-number">1.3.2.</span> <span class="nav-text">配置存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置获取"><span class="nav-number">1.3.3.</span> <span class="nav-text">配置获取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置变更"><span class="nav-number">1.3.4.</span> <span class="nav-text">配置变更</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lsy</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"buptlsy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
