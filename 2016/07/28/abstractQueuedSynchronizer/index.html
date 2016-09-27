@@ -90,7 +90,7 @@
 <meta property="og:url" content="http://yoursite.com/2016/07/28/abstractQueuedSynchronizer/index.html">
 <meta property="og:site_name" content="大道至简">
 <meta property="og:description" content="abstractQueuedSynchronizer提供了一个依赖于先进先出的等待队列实现了阻塞锁和同步。这个类是利用一个表示状态的int值来为各种同步设计的。子类必须定义protect方法来改变状态（状态表示这个object是被获取还是释放）。其他的方法实现了所有的排队和阻塞机制。它支持排他锁和共享锁两种模式。例如读写锁。">
-<meta property="og:updated_time" content="2016-07-28T03:12:52.332Z">
+<meta property="og:updated_time" content="2016-09-26T18:17:29.417Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="abstractQueuedSynchronizer详解">
 <meta name="twitter:description" content="abstractQueuedSynchronizer提供了一个依赖于先进先出的等待队列实现了阻塞锁和同步。这个类是利用一个表示状态的int值来为各种同步设计的。子类必须定义protect方法来改变状态（状态表示这个object是被获取还是释放）。其他的方法实现了所有的排队和阻塞机制。它支持排他锁和共享锁两种模式。例如读写锁。">
@@ -312,8 +312,39 @@
       
 
       
-        <p>abstractQueuedSynchronizer提供了一个依赖于先进先出的等待队列实现了阻塞锁和同步。这个类是利用一个表示状态的int值来为各种同步设计的。子类必须定义protect方法来改变状态（状态表示这个object是被获取还是释放）。其他的方法实现了所有的排队和阻塞机制。它支持排他锁和共享锁两种模式。例如读写锁。<br><a id="more"></a><br>例子1：（利用abstractQueuedSynchronizer来实现互斥锁）<br>    class Mutex implements Lock, Serializable {<br>        private static class Sync extends AbstractQueuedSynchronizer {<br>            protected boolean isHeldExclusively() {<br>                return getState() == 1;<br>            }<br>            public boolean tryAcquire(int acquires) {<br>                assert acquires == 1;<br>                if (compareAndSetState(0, 1)) {<br>                    setExclusiveOwnerThread(Thread.currentThread());<br>                    return true;<br>                }<br>                return false;<br>            }<br>            protected boolean tryRelease(int release) {<br>                assert release == 1;<br>                if (getState() == 0) throw new IllegalMonitorStateException();<br>                setExclusiveOwnerThread(null);<br>                setState(0);<br>                return true;<br>            }<br>            Condition newCondition() {<br>                return new ConditionObject();<br>            }<br>            private void readObject(ObjectInputStream s)<br>                throws IOException, ClassNotFoundException {<br>                s.defaultReadObject();<br>                setState(0);<br>            }<br>        }</p>
-<pre><code>    private final Sync sync = new Sync();
+        <p>abstractQueuedSynchronizer提供了一个依赖于先进先出的等待队列实现了阻塞锁和同步。这个类是利用一个表示状态的int值来为各种同步设计的。子类必须定义protect方法来改变状态（状态表示这个object是被获取还是释放）。其他的方法实现了所有的排队和阻塞机制。它支持排他锁和共享锁两种模式。例如读写锁。<br><a id="more"></a></p>
+<h2 id="aqs的用例"><a href="#aqs的用例" class="headerlink" title="aqs的用例"></a>aqs的用例</h2><p>例子1：（利用abstractQueuedSynchronizer来实现互斥锁）</p>
+<pre><code>class Mutex implements Lock, Serializable {
+    private static class Sync extends AbstractQueuedSynchronizer {
+        protected boolean isHeldExclusively() {
+            return getState() == 1;
+        }
+        public boolean tryAcquire(int acquires) {
+            assert acquires == 1;
+            if (compareAndSetState(0, 1)) {
+                setExclusiveOwnerThread(Thread.currentThread());
+                return true;
+            }
+            return false;
+        }
+        protected boolean tryRelease(int release) {
+            assert release == 1;
+            if (getState() == 0) throw new IllegalMonitorStateException();
+            setExclusiveOwnerThread(null);
+            setState(0);
+            return true;
+        }
+        Condition newCondition() {
+            return new ConditionObject();
+        }
+        private void readObject(ObjectInputStream s) 
+            throws IOException, ClassNotFoundException {
+            s.defaultReadObject();
+            setState(0);
+        }
+    }
+
+    private final Sync sync = new Sync();
     public void lock() {
         sync.acquire(1);
     }
@@ -340,7 +371,95 @@
         return sync.tryAcquireNanos(1, unit.toNanos(timeout));
     }
 }
-</code></pre><p>例子2：</p>
+</code></pre><h2 id="实现原理分析"><a href="#实现原理分析" class="headerlink" title="实现原理分析"></a>实现原理分析</h2><p>类似于synchronized与wait、notify、notifyAll的对应关系，aqs是lock的wait、notify、notifyAll的实现。aqs是自旋锁的一种改进。aqs是通过sync queue和condition queue实现的。sync队列中存储的是没有获取到锁需要等待的线程，是双链表实现的，而condition queue存储的是需要等待条件满足触发的线程，是单链表实现的。队列中的每个元素是Node类型的，Node中的属性包括：<br>waitStatus、thread、前一个节点、后一个节点和nextWaiter。waitStatus包括：</p>
+<ul>
+<li>canceled  线程已经结束</li>
+<li>signal 后继节点上的线程需要unpark</li>
+<li>condition 这个节点是在condition queue中。当从condition queue移到sync queue中时，会置为0.</li>
+<li>propagate </li>
+</ul>
+<h3 id="sync-queue的使用"><a href="#sync-queue的使用" class="headerlink" title="sync queue的使用"></a>sync queue的使用</h3><pre><code>+-----------
+lock.lock()
++-----------
+     |
+     V
++------------+
+aqs.acquire(1)
++------------+                                         1.先获取当前线程和当前节点的状态state
+     |                                                 2.如果state为0，表示没有线程抢占过资源
+     V                                                   2.1 如果sync 队列中没有元素，或者当前线程是队列首元素，并且成功地设置state=1，返回true
++----------------+  子类实现tryAcquire，以FairSync为例 3.如果当前线程是获取到锁的线程，则实现了可重入锁。设置state=state+1,返回true
+aqs.tryAcquire(1)| ====================================4.其他情况返回false
++----------------+
+     |                                                        1.调用Node构造方法，新建节点node
+     V                                                        2.UNSAFE地设置node为tail.nex
++--------------------------------------------   addWaiter实现 3.如果失败的话，则调用enq(node)
+acquireQueued(addWaiter(Node.EXCLUSIVE), arg)| ==============   3.1 enq实现：无限循环地将node设置为tail.next
++--------------------------------------------
+           acquireQueued实现 1.整个实现是出于无条件循环中
+           ================= 2.如果node的前驱是head并且tryAcquire成功，则将head=node并返回false。
+                             3.步骤2失败的话，则调用shouldParkAfterFailedAcquire(p, node)
+                               3.1 如果node前驱节点的waitStatus为SIGNAL，则返回true
+                               3.2 如果node前驱节点的waitStatus &gt; 0,则找出Node前驱节点中最末一个节点waitStatus &lt;= 0.返回false
+                               3.3 否则的话，设置node前驱结点的waitStatus为SIGNAL. 返回false
+                             4. 步骤3返回true的话，调用parkAndCheckInterrupt
+                               4.1 挂起当前线程  LockSupport.park()
+
+
+
+
+
+------------
+lock.unlock()
+------------
+     |
+     V
+--------------
+aqs.release(1)
+--------------                                         1.c=state-1
+     |                                                 2.如果c为0，表示释放成功
+     V                                                   
+------------------  子类实现tryRelease，以FairSync为例 3.否则的话,state=c
+aqs.tryRelease(1)| ====================================
+------------------
+     |
+     V
+------------------------------
+head!=null&amp;&amp;head.waitStatus!=0
+------------------------------
+     |                                      1.如果head.waitStatus &lt; 0,则将head.waitStatus=0
+     V                                      2.从队尾往前遍历，找到最接近head的节点的状态&lt;=0
+---------------------   unparkSuccessor实现 3.LockSupport.unpark() 这个节点的线程
+unparkSuccessor(head)| ===================== 
+---------------------
+
+### condition queue的使用
+
+condition类似于Object中的wait()、notify()和NotifyAll的实现。
+</code></pre><h4 id="await-的实现"><a href="#await-的实现" class="headerlink" title="await()的实现"></a>await()的实现</h4><pre><code>                                1.如果最后一个等待节点的状态不是CONDITION，那么执行 unlinkCancelledWaiters  
+                                  1.1 unlinkCancelledWaiters 是去除已经结束的等待节点                     
+--------------------     实现  
+addConditionWaiter()| ========= 2. 将node加入等待队列中
+--------------------
+     |
+     V                1.调用release()方法
+------------   实现     1.1 调用子类重写的tryRelease()  
+fullyRelease| ========  1.2 调用unparkSuccessor(head) 同上
+------------          2.如果失败的话，则将当前节点的状态置为CANCELED
+     |
+     V
+-------------------           是                 -------------------
+isOnSyncQueue(node)| -------------------------&gt; | acquireQueued
+-------------------                              -------------------
+     |否
+     V
+--------------------------------
+checkInterruptWhileWaiting(node)| 
+--------------------------------
+   实现
+  ======= 1.调用transferAfterCancelledWait
+            1.1 将wait queue中的节点加入到sync queue中
+</code></pre><h3 id="doSignal-的实现"><a href="#doSignal-的实现" class="headerlink" title="doSignal()的实现"></a>doSignal()的实现</h3><p>调用transferForSignal()方法。该方法主要是将一个从wait queue移到sync queue中，并将sync中前一个节点的状态置为SIGNAL。如果设置失败或者<br>前一个节点的状态&gt;0，那么LockSupport.unpark(node.thread);</p>
 
       
     </div>
@@ -450,7 +569,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">17</span>
+              <span class="site-state-item-count">18</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -496,7 +615,7 @@
               
             
             
-              <p class="post-toc-empty">此文章未包含目录</p>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#aqs的用例"><span class="nav-number">1.</span> <span class="nav-text">aqs的用例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现原理分析"><span class="nav-number">2.</span> <span class="nav-text">实现原理分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sync-queue的使用"><span class="nav-number">2.1.</span> <span class="nav-text">sync queue的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#await-的实现"><span class="nav-number">2.1.1.</span> <span class="nav-text">await()的实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#doSignal-的实现"><span class="nav-number">2.2.</span> <span class="nav-text">doSignal()的实现</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
