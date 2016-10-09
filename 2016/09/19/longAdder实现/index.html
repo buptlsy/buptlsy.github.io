@@ -84,13 +84,16 @@
 
 
 
+<meta name="description" content="为了不断提升并发性能，从悲观锁到乐观锁，再到无锁，体现了牺牲空间换时间的思想。下面以对整数的的加法操作的jdk源码的实现，来看看是如何改进性能的。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="longAdder实现">
+<meta property="og:title" content="从longAdder看并发性能的改进">
 <meta property="og:url" content="http://yoursite.com/2016/09/19/longAdder实现/index.html">
 <meta property="og:site_name" content="大道至简">
-<meta property="og:updated_time" content="2016-09-18T16:15:20.654Z">
+<meta property="og:description" content="为了不断提升并发性能，从悲观锁到乐观锁，再到无锁，体现了牺牲空间换时间的思想。下面以对整数的的加法操作的jdk源码的实现，来看看是如何改进性能的。">
+<meta property="og:updated_time" content="2016-10-09T16:46:05.571Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="longAdder实现">
+<meta name="twitter:title" content="从longAdder看并发性能的改进">
+<meta name="twitter:description" content="为了不断提升并发性能，从悲观锁到乐观锁，再到无锁，体现了牺牲空间换时间的思想。下面以对整数的的加法操作的jdk源码的实现，来看看是如何改进性能的。">
 
 
 
@@ -113,7 +116,7 @@
 
   <link rel="canonical" href="http://yoursite.com/2016/09/19/longAdder实现/"/>
 
-  <title> longAdder实现 | 大道至简 </title>
+  <title> 从longAdder看并发性能的改进 | 大道至简 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -243,7 +246,7 @@
             
             
               
-                longAdder实现
+                从longAdder看并发性能的改进
               
             
           </h1>
@@ -309,7 +312,117 @@
       
 
       
-        
+        <p>为了不断提升并发性能，从悲观锁到乐观锁，再到无锁，体现了牺牲空间换时间的思想。下面以对整数的的加法操作的jdk源码的实现，来看看是如何改进性能的。<br><a id="more"></a></p>
+<h2 id="悲观锁的实现"><a href="#悲观锁的实现" class="headerlink" title="悲观锁的实现"></a>悲观锁的实现</h2><p>悲观锁很简单，就是利用synchronized、lock等对临界资源进行加锁，同一时刻只能有一个线程对临界资源进行操作。这种实现性能比较低，大多数线程都处于等待状态。</p>
+<h2 id="乐观锁的实现"><a href="#乐观锁的实现" class="headerlink" title="乐观锁的实现"></a>乐观锁的实现</h2><p>是利用cas的原理实现的。比如AtomicInteger的实现：</p>
+<pre><code>public final int getAndUpdate(IntUnaryOperator updateFunction) {
+    int prev, next;
+    do {
+        prev = get();
+        next = updateFunction.applyAsInt(prev);
+    } while (!compareAndSet(prev, next));
+    return prev;
+}
+</code></pre><p>这种实现可以使得每个线程同时对临界资源进行操作，但是成功的只有一个线程。不成功的线程进行重试，直到成功为止。这种方式在一个时刻失败的线程会很多。但是性能上比悲观锁是好的。</p>
+<h2 id="更细粒度的乐观锁的实现"><a href="#更细粒度的乐观锁的实现" class="headerlink" title="更细粒度的乐观锁的实现"></a>更细粒度的乐观锁的实现</h2><p>大体思想是：将原始数字放在一个数组中，占着一个位置。当很多线程对这个数字进行操作时，如果有线程对这个位置操作，那么其他线程可以尝试对其他位置进行操作。</p>
+<ul>
+<li>数组大小为2的幂次</li>
+<li>数组的最大大小为cpu个数</li>
+<li>通过每个线程的哈希码来进行掩码计算，来确定位置</li>
+<li><p>每个元素通过缓冲行填充，来避免伪共享 @sun.misc.Contended</p>
+<p>  public void add(long x) {</p>
+<pre><code>Cell[] as; long b, v; int m; Cell a;
+if ((as = cells) != null || !casBase(b = base, b + x)) { //如果对原始数字进行cas失败，则不再进行重试
+    boolean uncontended = true;
+    if (as == null || (m = as.length - 1) &lt; 0 ||
+        (a = as[getProbe() &amp; m]) == null ||
+        !(uncontended = a.cas(v = a.value, v + x))) //如果指定位置进行cas失败，也不进行重试
+        longAccumulate(x, null, uncontended); //
+}
+</code></pre><p>  }</p>
+<p>  final void longAccumulate(long x, LongBinaryOperator fn,</p>
+<pre><code>                      boolean wasUncontended) {
+int h;
+if ((h = getProbe()) == 0) {
+    ThreadLocalRandom.current(); // force initialization
+    h = getProbe();
+    wasUncontended = true;
+}
+boolean collide = false;                // True if last slot nonempty
+for (;;) {
+    Cell[] as; Cell a; int n; long v;
+    if ((as = cells) != null &amp;&amp; (n = as.length) &gt; 0) {
+        if ((a = as[(n - 1) &amp; h]) == null) {
+            if (cellsBusy == 0) {       // cellsBusy是自旋锁，当重新调整大小或者创建cell时。为0表示没有线程创建cell
+                Cell r = new Cell(x);   // Optimistically create
+                if (cellsBusy == 0 &amp;&amp; casCellsBusy()) { //获取cellsBusy
+                    boolean created = false;
+                    try {               // Recheck under lock
+                        Cell[] rs; int m, j;
+                        if ((rs = cells) != null &amp;&amp;
+                            (m = rs.length) &gt; 0 &amp;&amp;
+                            rs[j = (m - 1) &amp; h] == null) {
+                            rs[j] = r;
+                            created = true;
+                        }
+                    } finally {
+                        cellsBusy = 0; //释放cellsBusy
+                    }
+                    if (created)
+                        break;
+                    continue;           // Slot is now non-empty
+                }
+            }
+            collide = false;
+        }
+        else if (!wasUncontended)       // CAS already known to fail
+            wasUncontended = true;      // Continue after rehash
+        else if (a.cas(v = a.value, ((fn == null) ? v + x :
+                                     fn.applyAsLong(v, x)))) //在这个位置上进行cas
+            break;
+        else if (n &gt;= NCPU || cells != as) //达到数组元素的最大数目
+            collide = false;            // At max size or stale
+        else if (!collide) //当数组元素达到最大数目时，不进行扩容
+            collide = true;
+        else if (cellsBusy == 0 &amp;&amp; casCellsBusy()) { //成倍扩展数组
+            try {
+                if (cells == as) {      // Expand table unless stale
+                    Cell[] rs = new Cell[n &lt;&lt; 1];
+                    for (int i = 0; i &lt; n; ++i)
+                        rs[i] = as[i];
+                    cells = rs;
+                }
+            } finally {
+                cellsBusy = 0;
+            }
+            collide = false;
+            continue;                   // Retry with expanded table
+        }
+        h = advanceProbe(h);
+    }
+    else if (cellsBusy == 0 &amp;&amp; cells == as &amp;&amp; casCellsBusy()) { //初始化数组
+        boolean init = false;
+        try {                           // Initialize table
+            if (cells == as) {
+                Cell[] rs = new Cell[2];
+                rs[h &amp; 1] = new Cell(x);
+                cells = rs;
+                init = true;
+            }
+        } finally {
+            cellsBusy = 0;
+        }
+        if (init)
+            break;
+    }
+    else if (casBase(v = base, ((fn == null) ? v + x :
+                                fn.applyAsLong(v, x))))
+        break;                          // 只能用base
+}
+</code></pre><p>  }</p>
+</li>
+</ul>
+
       
     </div>
 
@@ -373,7 +486,7 @@
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2016/09/19/longAdder实现/"
-           data-title="longAdder实现" data-url="http://yoursite.com/2016/09/19/longAdder实现/">
+           data-title="从longAdder看并发性能的改进" data-url="http://yoursite.com/2016/09/19/longAdder实现/">
       </div>
     
   </div>
@@ -464,7 +577,7 @@
               
             
             
-              <p class="post-toc-empty">此文章未包含目录</p>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#悲观锁的实现"><span class="nav-number">1.</span> <span class="nav-text">悲观锁的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#乐观锁的实现"><span class="nav-number">2.</span> <span class="nav-text">乐观锁的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更细粒度的乐观锁的实现"><span class="nav-number">3.</span> <span class="nav-text">更细粒度的乐观锁的实现</span></a></li></ol></div>
             
           </div>
         </section>
