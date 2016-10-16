@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="hexo," />
+  <meta name="keywords" content="java，zk," />
 
 
 
@@ -84,16 +84,16 @@
 
 
 
-<meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.">
+<meta name="description" content="zk服务器有leader、follower和observer3三类。在处理客户端请求时，这三类服务器处理请求的实现有所不同。服务器是通过实现请求处理器来处理请求的。每个服务器可以包含一个请求处理器的序列。请求处理器是通过实现RequestProcessor接口。将请求放到队列中来供下一个处理器来处理。当一个处理器有一条请求需要进行处理时，它将这条请求加入队列。然后它将处于等待状态直到下一个处理器处">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hexo 的基本操作">
-<meta property="og:url" content="http://yoursite.com/2016/07/28/hello-world/index.html">
+<meta property="og:title" content="zk服务器处理请求的那些事">
+<meta property="og:url" content="http://yoursite.com/2016/10/16/zkServerPeocessRequest/index.html">
 <meta property="og:site_name" content="大道至简">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.">
-<meta property="og:updated_time" content="2016-07-28T03:12:52.336Z">
+<meta property="og:description" content="zk服务器有leader、follower和observer3三类。在处理客户端请求时，这三类服务器处理请求的实现有所不同。服务器是通过实现请求处理器来处理请求的。每个服务器可以包含一个请求处理器的序列。请求处理器是通过实现RequestProcessor接口。将请求放到队列中来供下一个处理器来处理。当一个处理器有一条请求需要进行处理时，它将这条请求加入队列。然后它将处于等待状态直到下一个处理器处">
+<meta property="og:updated_time" content="2016-10-16T07:54:36.863Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hexo 的基本操作">
-<meta name="twitter:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.">
+<meta name="twitter:title" content="zk服务器处理请求的那些事">
+<meta name="twitter:description" content="zk服务器有leader、follower和observer3三类。在处理客户端请求时，这三类服务器处理请求的实现有所不同。服务器是通过实现请求处理器来处理请求的。每个服务器可以包含一个请求处理器的序列。请求处理器是通过实现RequestProcessor接口。将请求放到队列中来供下一个处理器来处理。当一个处理器有一条请求需要进行处理时，它将这条请求加入队列。然后它将处于等待状态直到下一个处理器处">
 
 
 
@@ -114,9 +114,9 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/07/28/hello-world/"/>
+  <link rel="canonical" href="http://yoursite.com/2016/10/16/zkServerPeocessRequest/"/>
 
-  <title> hexo 的基本操作 | 大道至简 </title>
+  <title> zk服务器处理请求的那些事 | 大道至简 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -246,7 +246,7 @@
             
             
               
-                hexo 的基本操作
+                zk服务器处理请求的那些事
               
             
           </h1>
@@ -258,8 +258,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-28T11:12:52+08:00" content="2016-07-28">
-              2016-07-28
+            <time itemprop="dateCreated" datetime="2016-10-16T10:38:05+08:00" content="2016-10-16">
+              2016-10-16
             </time>
           </span>
 
@@ -272,8 +272,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/hexo/" itemprop="url" rel="index">
-                    <span itemprop="name">hexo</span>
+                  <a href="/categories/java，zk/" itemprop="url" rel="index">
+                    <span itemprop="name">java，zk</span>
                   </a>
                 </span>
 
@@ -288,8 +288,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/07/28/hello-world/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/28/hello-world/" itemprop="commentsCount"></span>
+                <a href="/2016/10/16/zkServerPeocessRequest/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/16/zkServerPeocessRequest/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -312,15 +312,25 @@
       
 
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.<br><a id="more"></a></p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+        <p>zk服务器有leader、follower和observer3三类。在处理客户端请求时，这三类服务器处理请求的实现有所不同。服务器是通过实现请求处理器来处理请求的。每个服务器可以包含一个请求处理器的序列。请求处理器是通过实现RequestProcessor接口。将请求放到队列中来供下一个处理器来处理。当一个处理器有一条请求需要进行处理时，它将这条请求加入队列。然后它将处于等待状态直到下一个处理器处理完此消息。<br><a id="more"></a></p>
+<h2 id="独立服务器"><a href="#独立服务器" class="headerlink" title="独立服务器"></a>独立服务器</h2><p>其实现类是ZookeeperServer类。请求处理器流程是：</p>
+<pre><code>|PrepRequestProcessor| ---&gt; |SyncRequestProcessor| ---&gt; |FinalRequestProcessor|
+</code></pre><p>PrepRequestProcessor:接受客户端请求并执行这个请求，如果是改变zk状态的操作会生成一个事务。事务信息将会以头部记录和事务记录的方式添加到Request对象中。<br>SyncRequestProcessor:将事务持久化到磁盘上。将事务按照顺寻追加到事务日志中，并生成快照。<br>FinalRequestProcessor:如果是事务操作会对zk数据树修改。如果是读操作，从数据树中读取数据并返回给客户端。</p>
+<h2 id="leader服务器"><a href="#leader服务器" class="headerlink" title="leader服务器"></a>leader服务器</h2><p>实现类是LeaderZookeeper.</p>
+<pre><code>|PrepRequestProcessor| ---&gt; |ProposalRequestProcessor| ----&gt; |CommitRequestProcessor| ---&gt; |ToBeAppliedRequestProcessor| ---&gt; |FinalRequestProcessor|
+                                       |                          
+                                       |-------------------&gt; |SyncRequestProcessor| ---&gt; |AckRequestProcessor|
+</code></pre><p>ProposalRequestProcessor:该处理器生成一个提议，并将提议发给follower。它会将所有请求转发给CommitRequestProcessor，而写请求同时会转发给SyncRequestProcessor。<br>AckRequestProcessor:生成确认信息并返回给自己。在仲裁模式下，leader需要收到每个服务器的确认信息，也包括leader自己，AckRequestProcessor就负责这个<br>CommitRequestProcessor:将收到足够多的确认消息的提议进行提交。确认消息是由leader类处理的。这个方法(leader.proccessAck)会将提交的请求加入到CommitRequestProcessor的队列中。<br>ToBeAppliedRequestProcessor:更新请求会加入到待接受请求列表中。Leader使用这个列表与追随者之间进行同步，并将接收到确认信息的请求加入到这个列表中。ToBeAppliedRequestProcessor会在FinalRequestProcessor处理完后删除这个列表中的元素。</p>
+<h2 id="follower服务器"><a href="#follower服务器" class="headerlink" title="follower服务器"></a>follower服务器</h2><p>实现类是 FollowerRequestProcessor。入口有 客户端请求、提议、提交事务。</p>
+<pre><code>|FollowerRequestProcessor| ---&gt; |CommitRequestProcessor| ---&gt; |FinalRequestProcessor|
+
+                            |SyncRequestProcessor| ---&gt; |SendAckRequestProcessor|
+</code></pre><p>处理流程： 当请求到达Follower时， FollowerRequestProcessor会将请求转发给CommitRequestProcessor，对于读请求则直接转发给FinalRequestProcessor。如果是写请求，则转发给leader。leader在将提议发给follower，该follower通过SendAckRequestProcessor发送确认消息给leader。当leader通过这个提议时，leader会将提交事务发给follower,follower通过CommitRequestProcessor进行处理。为了保证执行顺序，CommitRequestProcessor在收到一个写请求时，会暂停后续的请求处理。</p>
+<h2 id="observer服务器"><a href="#observer服务器" class="headerlink" title="observer服务器"></a>observer服务器</h2><p>实现类 ObserverZookeeperServer。<br>Observer服务器不参与投票选举。在提交事务时，leader会以INFORM消息通知给observer。</p>
+<h3 id="inform-消息"><a href="#inform-消息" class="headerlink" title="inform 消息"></a>inform 消息</h3><h3 id="observer服务器的作用"><a href="#observer服务器的作用" class="headerlink" title="observer服务器的作用"></a>observer服务器的作用</h3><ul>
+<li>提高读请求的可扩展性。通过加入多个观察者，我们可以在不牺牲写操作的吞吐率的前提下服务更多的读操作。但是没加入一个观察者，每一个已提交事务就会多发一条额外消息。</li>
+<li>进行跨多数据中心的部署。引入observer,更新请求可以以高吞吐率和低延迟的方式在一个数据中心内执行，接下来再传播到其他数据中心执行。</li>
+</ul>
 
       
     </div>
@@ -343,7 +353,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/hexo/" rel="tag">#hexo</a>
+            <a href="/tags/java，zk/" rel="tag">#java，zk</a>
           
         </div>
       
@@ -352,17 +362,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/07/28/countDownLatch/" rel="next" title="countDownLatch的使用和实现">
-                <i class="fa fa-chevron-left"></i> countDownLatch的使用和实现
+              <a href="/2016/10/10/伪共享/" rel="next" title="伪共享及其java中的解决方案">
+                <i class="fa fa-chevron-left"></i> 伪共享及其java中的解决方案
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/07/28/jdk_tools/" rel="prev" title="jdk内置工具的使用">
-                jdk内置工具的使用 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -388,8 +394,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/07/28/hello-world/"
-           data-title="hexo 的基本操作" data-url="http://yoursite.com/2016/07/28/hello-world/">
+      <div class="ds-thread" data-thread-key="2016/10/16/zkServerPeocessRequest/"
+           data-title="zk服务器处理请求的那些事" data-url="http://yoursite.com/2016/10/16/zkServerPeocessRequest/">
       </div>
     
   </div>
@@ -480,7 +486,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#独立服务器"><span class="nav-number">1.</span> <span class="nav-text">独立服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#leader服务器"><span class="nav-number">2.</span> <span class="nav-text">leader服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#follower服务器"><span class="nav-number">3.</span> <span class="nav-text">follower服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#observer服务器"><span class="nav-number">4.</span> <span class="nav-text">observer服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#inform-消息"><span class="nav-number">4.1.</span> <span class="nav-text">inform 消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#observer服务器的作用"><span class="nav-number">4.2.</span> <span class="nav-text">observer服务器的作用</span></a></li></ol></li></ol></div>
             
           </div>
         </section>

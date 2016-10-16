@@ -90,7 +90,7 @@
 <meta property="og:url" content="http://yoursite.com/2016/09/19/longAdder实现/index.html">
 <meta property="og:site_name" content="大道至简">
 <meta property="og:description" content="为了不断提升并发性能，从悲观锁到乐观锁，再到无锁，体现了牺牲空间换时间的思想。下面以对整数的的加法操作的jdk源码的实现，来看看是如何改进性能的。">
-<meta property="og:updated_time" content="2016-10-09T16:46:05.571Z">
+<meta property="og:updated_time" content="2016-10-10T15:55:05.504Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从longAdder看并发性能的改进">
 <meta name="twitter:description" content="为了不断提升并发性能，从悲观锁到乐观锁，再到无锁，体现了牺牲空间换时间的思想。下面以对整数的的加法操作的jdk源码的实现，来看看是如何改进性能的。">
@@ -329,100 +329,113 @@
 <li>数组大小为2的幂次</li>
 <li>数组的最大大小为cpu个数</li>
 <li>通过每个线程的哈希码来进行掩码计算，来确定位置</li>
-<li><p>每个元素通过缓冲行填充，来避免伪共享 @sun.misc.Contended</p>
-<p>  public void add(long x) {</p>
-<pre><code>Cell[] as; long b, v; int m; Cell a;
-if ((as = cells) != null || !casBase(b = base, b + x)) { //如果对原始数字进行cas失败，则不再进行重试
-    boolean uncontended = true;
-    if (as == null || (m = as.length - 1) &lt; 0 ||
-        (a = as[getProbe() &amp; m]) == null ||
-        !(uncontended = a.cas(v = a.value, v + x))) //如果指定位置进行cas失败，也不进行重试
-        longAccumulate(x, null, uncontended); //
+<li>每个元素通过缓冲行填充，来避免伪共享 @sun.misc.Contended</li>
+</ul>
+<pre><code>public void add(long x) {
+    Cell[] as; long b, v; int m; Cell a;
+    if ((as = cells) != null || !casBase(b = base, b + x)) { //如果对原始数字进行cas失败，则不再进行重试
+        boolean uncontended = true;
+        if (as == null || (m = as.length - 1) &lt; 0 ||
+            (a = as[getProbe() &amp; m]) == null ||
+            !(uncontended = a.cas(v = a.value, v + x))) //如果指定位置进行cas失败，也不进行重试
+            longAccumulate(x, null, uncontended); //
+    }
 }
-</code></pre><p>  }</p>
-<p>  final void longAccumulate(long x, LongBinaryOperator fn,</p>
-<pre><code>                      boolean wasUncontended) {
-int h;
-if ((h = getProbe()) == 0) {
-    ThreadLocalRandom.current(); // force initialization
-    h = getProbe();
-    wasUncontended = true;
-}
-boolean collide = false;                // True if last slot nonempty
-for (;;) {
-    Cell[] as; Cell a; int n; long v;
-    if ((as = cells) != null &amp;&amp; (n = as.length) &gt; 0) {
-        if ((a = as[(n - 1) &amp; h]) == null) {
-            if (cellsBusy == 0) {       // cellsBusy是自旋锁，当重新调整大小或者创建cell时。为0表示没有线程创建cell
-                Cell r = new Cell(x);   // Optimistically create
-                if (cellsBusy == 0 &amp;&amp; casCellsBusy()) { //获取cellsBusy
-                    boolean created = false;
-                    try {               // Recheck under lock
-                        Cell[] rs; int m, j;
-                        if ((rs = cells) != null &amp;&amp;
-                            (m = rs.length) &gt; 0 &amp;&amp;
-                            rs[j = (m - 1) &amp; h] == null) {
-                            rs[j] = r;
-                            created = true;
+
+
+final void longAccumulate(long x, LongBinaryOperator fn,
+                          boolean wasUncontended) {
+    int h;
+    if ((h = getProbe()) == 0) {
+        ThreadLocalRandom.current(); // force initialization
+        h = getProbe();
+        wasUncontended = true;
+    }
+    boolean collide = false;                // True if last slot nonempty
+    for (;;) {
+        Cell[] as; Cell a; int n; long v;
+        if ((as = cells) != null &amp;&amp; (n = as.length) &gt; 0) {
+            if ((a = as[(n - 1) &amp; h]) == null) {
+                if (cellsBusy == 0) {       // cellsBusy是自旋锁，当重新调整大小或者创建cell时。为0表示没有线程创建cell
+                    Cell r = new Cell(x);   // Optimistically create
+                    if (cellsBusy == 0 &amp;&amp; casCellsBusy()) { //获取cellsBusy
+                        boolean created = false;
+                        try {               // Recheck under lock
+                            Cell[] rs; int m, j;
+                            if ((rs = cells) != null &amp;&amp;
+                                (m = rs.length) &gt; 0 &amp;&amp;
+                                rs[j = (m - 1) &amp; h] == null) {
+                                rs[j] = r;
+                                created = true;
+                            }
+                        } finally {
+                            cellsBusy = 0; //释放cellsBusy
                         }
-                    } finally {
-                        cellsBusy = 0; //释放cellsBusy
+                        if (created)
+                            break;
+                        continue;           // Slot is now non-empty
                     }
-                    if (created)
-                        break;
-                    continue;           // Slot is now non-empty
                 }
+                collide = false;
             }
-            collide = false;
+            else if (!wasUncontended)       // CAS already known to fail
+                wasUncontended = true;      // Continue after rehash
+            else if (a.cas(v = a.value, ((fn == null) ? v + x :
+                                         fn.applyAsLong(v, x)))) //在这个位置上进行cas
+                break;
+            else if (n &gt;= NCPU || cells != as) //达到数组元素的最大数目
+                collide = false;            // At max size or stale
+            else if (!collide) //当数组元素达到最大数目时，不进行扩容
+                collide = true;
+            else if (cellsBusy == 0 &amp;&amp; casCellsBusy()) { //成倍扩展数组
+                try {
+                    if (cells == as) {      // Expand table unless stale
+                        Cell[] rs = new Cell[n &lt;&lt; 1];
+                        for (int i = 0; i &lt; n; ++i)
+                            rs[i] = as[i];
+                        cells = rs;
+                    }
+                } finally {
+                    cellsBusy = 0;
+                }
+                collide = false;
+                continue;                   // Retry with expanded table
+            }
+            h = advanceProbe(h);
         }
-        else if (!wasUncontended)       // CAS already known to fail
-            wasUncontended = true;      // Continue after rehash
-        else if (a.cas(v = a.value, ((fn == null) ? v + x :
-                                     fn.applyAsLong(v, x)))) //在这个位置上进行cas
-            break;
-        else if (n &gt;= NCPU || cells != as) //达到数组元素的最大数目
-            collide = false;            // At max size or stale
-        else if (!collide) //当数组元素达到最大数目时，不进行扩容
-            collide = true;
-        else if (cellsBusy == 0 &amp;&amp; casCellsBusy()) { //成倍扩展数组
-            try {
-                if (cells == as) {      // Expand table unless stale
-                    Cell[] rs = new Cell[n &lt;&lt; 1];
-                    for (int i = 0; i &lt; n; ++i)
-                        rs[i] = as[i];
+        else if (cellsBusy == 0 &amp;&amp; cells == as &amp;&amp; casCellsBusy()) { //初始化数组
+            boolean init = false;
+            try {                           // Initialize table
+                if (cells == as) {
+                    Cell[] rs = new Cell[2];
+                    rs[h &amp; 1] = new Cell(x);
                     cells = rs;
+                    init = true;
                 }
             } finally {
                 cellsBusy = 0;
             }
-            collide = false;
-            continue;                   // Retry with expanded table
+            if (init)
+                break;
         }
-        h = advanceProbe(h);
+        else if (casBase(v = base, ((fn == null) ? v + x :
+                                    fn.applyAsLong(v, x))))
+            break;                          // 只能用base
     }
-    else if (cellsBusy == 0 &amp;&amp; cells == as &amp;&amp; casCellsBusy()) { //初始化数组
-        boolean init = false;
-        try {                           // Initialize table
-            if (cells == as) {
-                Cell[] rs = new Cell[2];
-                rs[h &amp; 1] = new Cell(x);
-                cells = rs;
-                init = true;
-            }
-        } finally {
-            cellsBusy = 0;
-        }
-        if (init)
-            break;
-    }
-    else if (casBase(v = base, ((fn == null) ? v + x :
-                                fn.applyAsLong(v, x))))
-        break;                          // 只能用base
 }
-</code></pre><p>  }</p>
-</li>
-</ul>
-
+</code></pre><p>longAdder在获得返回值时，会调用sum()。从源码可以看出，返回值不是确保实时准确的。</p>
+<pre><code>public long sum() {
+    Cell[] as = cells; Cell a;
+    long sum = base;
+    if (as != null) {
+        for (int i = 0; i &lt; as.length; ++i) {
+            if ((a = as[i]) != null)
+                sum += a.value;
+        }
+    }
+    return sum;
+}
+</code></pre>
       
     </div>
 
@@ -460,6 +473,10 @@ for (;;) {
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/10/伪共享/" rel="prev" title="伪共享及其java中的解决方案">
+                伪共享及其java中的解决方案 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -531,7 +548,7 @@ for (;;) {
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">18</span>
+              <span class="site-state-item-count">20</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -539,7 +556,7 @@ for (;;) {
           
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -548,7 +565,7 @@ for (;;) {
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">9</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
