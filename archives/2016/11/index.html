@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="zk," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -84,16 +84,12 @@
 
 
 
-<meta name="description" content="在处理zk的问题时，需要对zk做些操作，来确定问题的缘由。而对zk的基本操作包括连接zk服务器、查看节点、删除节点、查看数据等。">
-<meta property="og:type" content="article">
-<meta property="og:title" content="zk的基本操作">
-<meta property="og:url" content="http://yoursite.com/2016/10/25/zkBaseOperation/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="大道至简">
+<meta property="og:url" content="http://yoursite.com/archives/2016/11/index.html">
 <meta property="og:site_name" content="大道至简">
-<meta property="og:description" content="在处理zk的问题时，需要对zk做些操作，来确定问题的缘由。而对zk的基本操作包括连接zk服务器、查看节点、删除节点、查看数据等。">
-<meta property="og:updated_time" content="2016-10-24T16:42:16.231Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zk的基本操作">
-<meta name="twitter:description" content="在处理zk的问题时，需要对zk做些操作，来确定问题的缘由。而对zk的基本操作包括连接zk服务器、查看节点、删除节点、查看数据等。">
+<meta name="twitter:title" content="大道至简">
 
 
 
@@ -114,9 +110,9 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/10/25/zkBaseOperation/"/>
+  <link rel="canonical" href="http://yoursite.com/archives/2016/11/"/>
 
-  <title> zk的基本操作 | 大道至简 </title>
+  <title> 归档 | 大道至简 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -147,7 +143,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left page-post-detail ">
+  <div class="container one-collumn sidebar-position-left  page-archive  ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -225,183 +221,66 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-expand">
+  <section id="posts" class="posts-collapse">
+    <span class="archive-move-on"></span>
+
+    <span class="archive-page-counter">
+      
+      
+      
+        
+      
+      嗯..! 目前共计 23 篇日志。 继续努力。
+    </span>
+
     
 
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                zk的基本操作
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-10-25T00:20:55+08:00" content="2016-10-25">
-              2016-10-25
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/zk/" itemprop="url" rel="index">
-                    <span itemprop="name">zk</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/10/25/zkBaseOperation/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/25/zkBaseOperation/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
+      
       
       
 
-      
-        <p>在处理zk的问题时，需要对zk做些操作，来确定问题的缘由。而对zk的基本操作包括连接zk服务器、查看节点、删除节点、查看数据等。<br><a id="more"></a></p>
-<h2 id="连接zk-server"><a href="#连接zk-server" class="headerlink" title="连接zk server"></a>连接zk server</h2><p>需要安装zk，然后运行./zkCli.sh -server ip:port 即可连上zk 的服务器。接下来便可以在zk server上做些操作了</p>
-<h2 id="节点操作"><a href="#节点操作" class="headerlink" title="节点操作"></a>节点操作</h2><ul>
-<li>查看某个节点下面的子节点 ls /path</li>
-<li>查看某个节点的内容 get /path/node1</li>
-<li>删除某个节点 delete /path/node1</li>
-<li>给某个节点设置新值 set /path/node1 xxx</li>
-</ul>
-<h2 id="查看数据"><a href="#查看数据" class="headerlink" title="查看数据"></a>查看数据</h2><p>查看zk 的数据可以通过事务日志或者snapshot查看。</p>
-<ul>
-<li>事务日志</li>
-</ul>
-<pre><code>java -cp /home/zookeeper/zookeeper-3.4.6.jar:/home/zookeeper/lib/slf4j-api-1.6.1.jar org.apache.zookeeper.server.LogFormatter log.700478c14 
-
-日志内容：
-10/12/16 8:52:28 PM CST session 0x357657c73714c38 cxid 0x4 zxid 0x70060241b create &apos;/Duobao/task/quanziNotifyTask/cluster_lock0000000153,#31302e3132302e3234312e313632（节点内容）,v{s{31,s{&apos;world,&apos;anyone}}},T,154
-</code></pre><ul>
-<li>snapshot</li>
-</ul>
-<pre><code>java -cp /home/zookeeper/zookeeper-3.4.6.jar:/home/zookeeper/lib/slf4j-api-1.6.1.jar org.apache.zookeeper.server.SnapshotFormatter snapshot.70049b8b5
-
-snapshot文件内容：
-    cZxid：创建节点时的ZXID
-　　ctime：创建节点的时间
-　　mZxid：节点最新一次更新发生时的zxid
-　　mtime：最近一次节点更新的时间
-　　pZxid：父节点的zxid
-　　cversion：子节点更新次数
-　　dataVersion：节点数据更新次数
-　　aclVersion：节点acl更新次数
-　　ephemeralOwner：如果节点为ephemeral节点则该值为sessionid，否则为0
-　　dataLength：该节点数据的长度
-</code></pre>
-      
-    </div>
-
-    <div>
       
         
-
-      
-    </div>
-
-    <div>
-      
-        
-
-      
-    </div>
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/zk/" rel="tag">#zk</a>
-          
+        <div class="collection-title">
+          <h2 class="archive-year motion-element" id="archive-year-2016">2016</h2>
         </div>
       
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2016/10/23/zkSession/" rel="next" title="zk session的那些事">
-                <i class="fa fa-chevron-left"></i> zk session的那些事
-              </a>
-            
-          </div>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/11/24/linux oom killer的那些事/" rel="prev" title="linux oom killer的那些事">
-                linux oom killer的那些事 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
       
 
       
-      
-    </footer>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <h1 class="post-title">
+        
+            <a class="post-title-link" href="/2016/11/24/linux oom killer的那些事/" itemprop="url">
+              
+                <span itemprop="name">linux oom killer的那些事</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated"
+              datetime="2016-11-24T08:39:27+08:00"
+              content="2016-11-24" >
+          11-24
+        </time>
+      </div>
+
+    </header>
   </article>
 
 
 
-    <div class="post-spread">
-      
-    </div>
-  </div>
+    
+
+  </section>
+
+  
+
 
 
           </div>
@@ -409,14 +288,6 @@ snapshot文件内容：
 
 
           
-  <div class="comments" id="comments">
-    
-      <div class="ds-thread" data-thread-key="2016/10/25/zkBaseOperation/"
-           data-title="zk的基本操作" data-url="http://yoursite.com/2016/10/25/zkBaseOperation/">
-      </div>
-    
-  </div>
-
 
         </div>
         
@@ -436,17 +307,8 @@ snapshot文件内容：
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview sidebar-panel ">
+      <section class="site-overview sidebar-panel  sidebar-panel-active ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="https://raw.githubusercontent.com/buptlsy/images/gh-pages/suolong.jpg"
@@ -496,17 +358,6 @@ snapshot文件内容：
 
       </section>
 
-      
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-            
-              
-            
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#连接zk-server"><span class="nav-number">1.</span> <span class="nav-text">连接zk server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#节点操作"><span class="nav-number">2.</span> <span class="nav-text">节点操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看数据"><span class="nav-number">3.</span> <span class="nav-text">查看数据</span></a></li></ol></div>
-            
-          </div>
-        </section>
       
 
     </div>
@@ -603,9 +454,11 @@ snapshot文件内容：
   
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
-
+  
+    <script type="text/javascript" id="motion.page.archive">
+      $('.archive-year').velocity('transition.slideLeftIn');
+    </script>
+  
 
 
   
