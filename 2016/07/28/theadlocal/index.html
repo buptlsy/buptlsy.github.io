@@ -91,7 +91,7 @@
 <meta property="og:site_name" content="大道至简">
 <meta property="og:description" content="threadlocal是另外一种解决多线程并发问题的方案。其主要思想是在每个线程中维护一份共享变量的副本。">
 <meta property="og:image" content="https://raw.githubusercontent.com/buptlsy/images/gh-pages/threadlocal-struct.png">
-<meta property="og:updated_time" content="2016-07-28T03:12:52.350Z">
+<meta property="og:updated_time" content="2017-02-26T03:19:14.902Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="threadlocal的那些事儿">
 <meta name="twitter:description" content="threadlocal是另外一种解决多线程并发问题的方案。其主要思想是在每个线程中维护一份共享变量的副本。">
@@ -353,8 +353,70 @@
         }
     }
 }
-</code></pre><p>上面的代码运行会出现抛出异常：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">java.lang.NumberFormatException: multiple points</div></pre></td></tr></table></figure></p>
-<p>这是因为多线程访问parse方法时，会对SimpleDateFormat的内部变量造成不确定的修改，从而会抛出异常。<br>解决方法可以是加锁 或者是 threadlocal。加锁的话，性能会造成影响。threadlocal是以空间换时间的策略。改变后的代码如下：</p>
+</code></pre><p>上面的代码运行会出现抛出异常：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line">java.lang.NumberFormatException: For input string: &quot;.21&quot;</div><div class="line">    at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65)</div><div class="line">    at java.lang.Long.parseLong(Long.java:578)</div><div class="line">    at java.lang.Long.parseLong(Long.java:631)</div><div class="line">    at java.text.DigitList.getLong(DigitList.java:195)</div><div class="line">    at java.text.DecimalFormat.parse(DecimalFormat.java:2051)</div><div class="line">    at java.text.SimpleDateFormat.subParse(SimpleDateFormat.java:2162)</div><div class="line">    at java.text.SimpleDateFormat.parse(SimpleDateFormat.java:1514)</div><div class="line">    at java.text.DateFormat.parse(DateFormat.java:364)</div><div class="line">    at Test$PrintDate.run(Test.java:24)</div><div class="line">    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)</div><div class="line">    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)</div><div class="line">    at java.lang.Thread.run(Thread.java:745)</div><div class="line">java.lang.NumberFormatException: For input string: &quot;&quot;</div><div class="line">    at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65)</div><div class="line">    at java.lang.Long.parseLong(Long.java:601)</div><div class="line">    at java.lang.Long.parseLong(Long.java:631)</div><div class="line">    at java.text.DigitList.getLong(DigitList.java:195)</div><div class="line">    at java.text.DecimalFormat.parse(DecimalFormat.java:2051)</div><div class="line">    at java.text.SimpleDateFormat.subParse(SimpleDateFormat.java:1869)</div><div class="line">    at java.text.SimpleDateFormat.parse(SimpleDateFormat.java:1514)</div><div class="line">    at java.text.DateFormat.parse(DateFormat.java:364)</div><div class="line">    at Test$PrintDate.run(Test.java:24)</div><div class="line">    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)</div><div class="line">    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)</div><div class="line">    at java.lang.Thread.run(Thread.java:745)</div><div class="line">java.lang.NumberFormatException: multiple points</div><div class="line">    at sun.misc.FloatingDecimal.readJavaFormatString(FloatingDecimal.java:1890)</div><div class="line">    at sun.misc.FloatingDecimal.parseDouble(FloatingDecimal.java:110)</div><div class="line">    at java.lang.Double.parseDouble(Double.java:538)</div><div class="line">    at java.text.DigitList.getDouble(DigitList.java:169)</div><div class="line">    at java.text.DecimalFormat.parse(DecimalFormat.java:2056)</div><div class="line">    at java.text.SimpleDateFormat.subParse(SimpleDateFormat.java:1869)</div><div class="line">    at java.text.SimpleDateFormat.parse(SimpleDateFormat.java:1514)</div><div class="line">    at java.text.DateFormat.parse(DateFormat.java:364)</div><div class="line">    at Test$PrintDate.run(Test.java:24)</div><div class="line">    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)</div><div class="line">    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)</div><div class="line">    at java.lang.Thread.run(Thread.java:745)</div><div class="line">java.lang.NumberFormatException: multiple points</div><div class="line">    at sun.misc.FloatingDecimal.readJavaFormatString(FloatingDecimal.java:1890)</div><div class="line">    at sun.misc.FloatingDecimal.parseDouble(FloatingDecimal.java:110)</div><div class="line">    at java.lang.Double.parseDouble(Double.java:538)</div><div class="line">    at java.text.DigitList.getDouble(DigitList.java:169)</div><div class="line">    at java.text.DecimalFormat.parse(DecimalFormat.java:2056)</div><div class="line">    at java.text.SimpleDateFormat.subParse(SimpleDateFormat.java:1869)</div><div class="line">    at java.text.SimpleDateFormat.parse(SimpleDateFormat.java:1514)</div><div class="line">    at java.text.DateFormat.parse(DateFormat.java:364)</div><div class="line">    at Test$PrintDate.run(Test.java:24)</div><div class="line">    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)</div><div class="line">    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)</div><div class="line">    at java.lang.Thread.run(Thread.java:745)</div></pre></td></tr></table></figure></p>
+<p>这是因为多线程访问parse方法时，会对SimpleDateFormat的内部变量造成不确定的修改，从而会抛出异常。<br>详细原因如下：SimpleDateFormat有个protected Calendar calendar变量。在parse方法中会对calendar变量做改变。因为多个线程享有一个SimpleDateFormat对象，也就只有一个calendar变量(共享资源)。</p>
+<pre><code>public Date parse(String text, ParsePosition pos) {
+    ...
+    ...
+    Date parsedDate;
+    try {
+        parsedDate = calb.establish(calendar).getTime();
+        // If the year value is ambiguous,
+        // then the two-digit year == the default start year
+        if (ambiguousYear[0]) {
+            if (parsedDate.before(defaultCenturyStart)) {
+                parsedDate = calb.addYear(100).establish(calendar).getTime();
+            }
+        }
+    }
+    ......
+}
+
+Calendar establish(Calendar cal) {
+    boolean weekDate = isSet(WEEK_YEAR)
+                        &amp;&amp; field[WEEK_YEAR] &gt; field[YEAR];
+    if (weekDate &amp;&amp; !cal.isWeekDateSupported()) {
+        // Use YEAR instead
+        if (!isSet(YEAR)) {
+            set(YEAR, field[MAX_FIELD + WEEK_YEAR]);
+        }
+        weekDate = false;
+    }
+
+    cal.clear();
+    // Set the fields from the min stamp to the max stamp so that
+    // the field resolution works in the Calendar.
+    for (int stamp = MINIMUM_USER_STAMP; stamp &lt; nextStamp; stamp++) {
+        for (int index = 0; index &lt;= maxFieldIndex; index++) {
+            if (field[index] == stamp) {
+                cal.set(index, field[MAX_FIELD + index]);
+                break;
+            }
+        }
+    }
+
+    if (weekDate) {
+        int weekOfYear = isSet(WEEK_OF_YEAR) ? field[MAX_FIELD + WEEK_OF_YEAR] : 1;
+        int dayOfWeek = isSet(DAY_OF_WEEK) ?
+                            field[MAX_FIELD + DAY_OF_WEEK] : cal.getFirstDayOfWeek();
+        if (!isValidDayOfWeek(dayOfWeek) &amp;&amp; cal.isLenient()) {
+            if (dayOfWeek &gt;= 8) {
+                dayOfWeek--;
+                weekOfYear += dayOfWeek / 7;
+                dayOfWeek = (dayOfWeek % 7) + 1;
+            } else {
+                while (dayOfWeek &lt;= 0) {
+                    dayOfWeek += 7;
+                    weekOfYear--;
+                }
+            }
+            dayOfWeek = toCalendarDayOfWeek(dayOfWeek);
+        }
+        cal.setWeekDate(field[MAX_FIELD + WEEK_YEAR], weekOfYear, dayOfWeek);
+    }
+    return cal;
+}
+</code></pre><p>解决方法可以是加锁 或者是 threadlocal。加锁的话，性能会造成影响。threadlocal是以空间换时间的策略。改变后的代码如下：</p>
 <pre><code>public class ThreadLocalTest {
 
     private static ThreadLocal&lt;SimpleDateFormat&gt; simpleDateFormats = new ThreadLocal&lt;SimpleDateFormat&gt;() {
