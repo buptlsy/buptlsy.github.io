@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="java," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -84,18 +84,12 @@
 
 
 
-<meta name="description" content="wait与notify的配合在java中，进程同步是利用synchronized()实现的。java的object类型中，带有一个内存锁。如果一个线程获取该内存锁后，其他线程便无法访问该内存。只有获取了Object的对象锁后，才能使用该对象的wait和notify。可以通过synchronized()和lock来获得内存锁。以synchronized为例，synchronized(obj)获得当前">
-<meta property="og:type" content="article">
-<meta property="og:title" content="wait,notify,sleep">
-<meta property="og:url" content="http://yoursite.com/2016/07/28/wait_notify/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="大道至简">
+<meta property="og:url" content="http://yoursite.com/archives/2017/04/index.html">
 <meta property="og:site_name" content="大道至简">
-<meta property="og:description" content="wait与notify的配合在java中，进程同步是利用synchronized()实现的。java的object类型中，带有一个内存锁。如果一个线程获取该内存锁后，其他线程便无法访问该内存。只有获取了Object的对象锁后，才能使用该对象的wait和notify。可以通过synchronized()和lock来获得内存锁。以synchronized为例，synchronized(obj)获得当前">
-<meta property="og:image" content="https://raw.githubusercontent.com/buptlsy/images/master/threads-java.gif">
-<meta property="og:updated_time" content="2016-07-28T03:12:52.351Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="wait,notify,sleep">
-<meta name="twitter:description" content="wait与notify的配合在java中，进程同步是利用synchronized()实现的。java的object类型中，带有一个内存锁。如果一个线程获取该内存锁后，其他线程便无法访问该内存。只有获取了Object的对象锁后，才能使用该对象的wait和notify。可以通过synchronized()和lock来获得内存锁。以synchronized为例，synchronized(obj)获得当前">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/buptlsy/images/master/threads-java.gif">
+<meta name="twitter:title" content="大道至简">
 
 
 
@@ -116,9 +110,9 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/07/28/wait_notify/"/>
+  <link rel="canonical" href="http://yoursite.com/archives/2017/04/"/>
 
-  <title> wait,notify,sleep | 大道至简 </title>
+  <title> 归档 | 大道至简 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -149,7 +143,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left page-post-detail ">
+  <div class="container one-collumn sidebar-position-left  page-archive  ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -237,161 +231,66 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-expand">
+  <section id="posts" class="posts-collapse">
+    <span class="archive-move-on"></span>
+
+    <span class="archive-page-counter">
+      
+      
+      
+        
+      
+      嗯..! 目前共计 26 篇日志。 继续努力。
+    </span>
+
     
 
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                wait,notify,sleep
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-28T11:12:52+08:00" content="2016-07-28">
-              2016-07-28
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/07/28/wait_notify/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/28/wait_notify/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
+      
       
       
 
-      
-        <h3 id="wait与notify的配合"><a href="#wait与notify的配合" class="headerlink" title="wait与notify的配合"></a>wait与notify的配合</h3><p>在java中，进程同步是利用synchronized()实现的。java的object类型中，带有一个内存锁。如果一个线程获取该内存锁后，其他线程便无法访问该内存。只有获取了Object的对象锁后，才能使用该对象的wait和notify。可以通过synchronized()和lock来获得内存锁。以synchronized为例，synchronized(obj)获得当前对象的锁；synchronized(class)来获得类的锁，保证在一个时刻只有一个线程可以访问这个类的实例。<br><a id="more"></a><br><img src="https://raw.githubusercontent.com/buptlsy/images/master/threads-java.gif" alt="线程状态图"></p>
-<ol>
-<li>wait：线程获得对象锁后，主动释放对象锁，同时本线程休眠。</li>
-<li>notify：唤醒等待的线程。notify调用后，并不是马上释放对象锁，而是在相应的synchronized(){}语句块执行结束，自动释放锁后，jvm会在wait()对象锁的线程中随机选取一线程，获取对象锁，唤醒线程，继续执行。</li>
-</ol>
-<h3 id="wait和sleep的区别"><a href="#wait和sleep的区别" class="headerlink" title="wait和sleep的区别"></a>wait和sleep的区别</h3><ol>
-<li>Thread.sleep(), Object.wait()</li>
-<li>两者都是暂停当前线程，释放cpu控制权</li>
-<li>wait在释放cpu时，同时释放了对象锁的控制</li>
-</ol>
-
-      
-    </div>
-
-    <div>
       
         
-
-      
-    </div>
-
-    <div>
-      
-        
-
-      
-    </div>
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/java/" rel="tag">#java</a>
-          
+        <div class="collection-title">
+          <h2 class="archive-year motion-element" id="archive-year-2017">2017</h2>
         </div>
       
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2016/07/28/theadlocal/" rel="next" title="threadlocal的那些事儿">
-                <i class="fa fa-chevron-left"></i> threadlocal的那些事儿
-              </a>
-            
-          </div>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/07/28/单例模式实现方式/" rel="prev" title="单例模式的实现方式">
-                单例模式的实现方式 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
       
 
       
-      
-    </footer>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <h1 class="post-title">
+        
+            <a class="post-title-link" href="/2017/04/24/spring aop事务/" itemprop="url">
+              
+                <span itemprop="name">spring 事务类内部调用不生效的问题</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated"
+              datetime="2017-04-24T14:30:38+08:00"
+              content="2017-04-24" >
+          04-24
+        </time>
+      </div>
+
+    </header>
   </article>
 
 
 
-    <div class="post-spread">
-      
-    </div>
-  </div>
+    
+
+  </section>
+
+  
+
 
 
           </div>
@@ -399,14 +298,6 @@
 
 
           
-  <div class="comments" id="comments">
-    
-      <div class="ds-thread" data-thread-key="2016/07/28/wait_notify/"
-           data-title="wait,notify,sleep" data-url="http://yoursite.com/2016/07/28/wait_notify/">
-      </div>
-    
-  </div>
-
 
         </div>
         
@@ -426,17 +317,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview sidebar-panel ">
+      <section class="site-overview sidebar-panel  sidebar-panel-active ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="https://raw.githubusercontent.com/buptlsy/images/gh-pages/suolong.jpg"
@@ -486,17 +368,6 @@
 
       </section>
 
-      
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-            
-              
-            
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#wait与notify的配合"><span class="nav-number">1.</span> <span class="nav-text">wait与notify的配合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wait和sleep的区别"><span class="nav-number">2.</span> <span class="nav-text">wait和sleep的区别</span></a></li></ol></div>
-            
-          </div>
-        </section>
       
 
     </div>
@@ -593,9 +464,11 @@
   
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
-
+  
+    <script type="text/javascript" id="motion.page.archive">
+      $('.archive-year').velocity('transition.slideLeftIn');
+    </script>
+  
 
 
   
