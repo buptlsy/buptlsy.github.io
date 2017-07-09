@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="linux," />
+  <meta name="keywords" content="algorithm," />
 
 
 
@@ -84,16 +84,21 @@
 
 
 
-<meta name="description" content="在服务器开发中，经常会碰到进程被杀死。而很大部分情况是因为oom killer导致的。当某时刻应用程序请求大量内存导致内存不足，会触发oom killer杀掉某个进程来遗留给系统，不致于让系统立刻崩溃。">
+<meta name="description" content="翻译 https://www2.cs.arizona.edu/classes/cs445/fall15/SL.pdfskip list:一个维护key排序的数据结构">
 <meta property="og:type" content="article">
-<meta property="og:title" content="linux oom killer的那些事">
-<meta property="og:url" content="http://yoursite.com/2016/11/24/linux oom killer的那些事/index.html">
+<meta property="og:title" content="skiplist[译]">
+<meta property="og:url" content="http://yoursite.com/2017/07/09/skiplist/index.html">
 <meta property="og:site_name" content="大道至简">
-<meta property="og:description" content="在服务器开发中，经常会碰到进程被杀死。而很大部分情况是因为oom killer导致的。当某时刻应用程序请求大量内存导致内存不足，会触发oom killer杀掉某个进程来遗留给系统，不致于让系统立刻崩溃。">
-<meta property="og:updated_time" content="2016-11-24T00:43:07.517Z">
+<meta property="og:description" content="翻译 https://www2.cs.arizona.edu/classes/cs445/fall15/SL.pdfskip list:一个维护key排序的数据结构">
+<meta property="og:image" content="https://raw.githubusercontent.com/buptlsy/images/gh-pages/skiplist1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/buptlsy/images/gh-pages/skiplist-find.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/buptlsy/images/gh-pages/skiplist-insert.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/buptlsy/images/gh-pages/skiplist-delete.png">
+<meta property="og:updated_time" content="2017-07-09T06:32:20.531Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="linux oom killer的那些事">
-<meta name="twitter:description" content="在服务器开发中，经常会碰到进程被杀死。而很大部分情况是因为oom killer导致的。当某时刻应用程序请求大量内存导致内存不足，会触发oom killer杀掉某个进程来遗留给系统，不致于让系统立刻崩溃。">
+<meta name="twitter:title" content="skiplist[译]">
+<meta name="twitter:description" content="翻译 https://www2.cs.arizona.edu/classes/cs445/fall15/SL.pdfskip list:一个维护key排序的数据结构">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/buptlsy/images/gh-pages/skiplist1.png">
 
 
 
@@ -114,9 +119,9 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/11/24/linux oom killer的那些事/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/07/09/skiplist/"/>
 
-  <title> linux oom killer的那些事 | 大道至简 </title>
+  <title> skiplist[译] | 大道至简 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -256,7 +261,7 @@
             
             
               
-                linux oom killer的那些事
+                skiplist[译]
               
             
           </h1>
@@ -268,8 +273,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-11-24T08:39:27+08:00" content="2016-11-24">
-              2016-11-24
+            <time itemprop="dateCreated" datetime="2017-07-09T14:19:06+08:00" content="2017-07-09">
+              2017-07-09
             </time>
           </span>
 
@@ -282,8 +287,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
+                  <a href="/categories/algorithm/" itemprop="url" rel="index">
+                    <span itemprop="name">algorithm</span>
                   </a>
                 </span>
 
@@ -298,8 +303,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/11/24/linux oom killer的那些事/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/24/linux oom killer的那些事/" itemprop="commentsCount"></span>
+                <a href="/2017/07/09/skiplist/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/09/skiplist/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -322,88 +327,48 @@
       
 
       
-        <p>在服务器开发中，经常会碰到进程被杀死。而很大部分情况是因为oom killer导致的。当某时刻应用程序请求大量内存导致内存不足，会触发oom killer杀掉某个进程来遗留给系统，不致于让系统立刻崩溃。<br><a id="more"></a></p>
-<h2 id="oom-killer的触发条件"><a href="#oom-killer的触发条件" class="headerlink" title="oom killer的触发条件"></a>oom killer的触发条件</h2><p>先来说一下overcommit机制。overcommit是从优化系统考虑，linux下允许申请比可用内存更多的内存。overcommit有3种机制：</p>
-<ul>
-<li>启发式策略：比较严重的得不到满足（比如申请12G和12B）</li>
-<li>永远允许overcommit：适合于不能允许内存分配失败的情况发生的场景</li>
-<li>永远禁止overcommit：系统所能分配的内存不能超过swap+RAM*系数（/proc/sys/vm/overcommit_ratio）。如果这么多资源都被消耗光了，那么此时不能运行任何新程序。<br>如果overcommit 分配的内存被使用完的话，就会触发oom killer。oom killer会选出一个进程来杀掉。</li>
+        <p>翻译 <a href="https://www2.cs.arizona.edu/classes/cs445/fall15/SL.pdf" target="_blank" rel="external">https://www2.cs.arizona.edu/classes/cs445/fall15/SL.pdf</a><br>skip list:一个维护key排序的数据结构<br><a id="more"></a></p>
+<h2 id="规则"><a href="#规则" class="headerlink" title="规则"></a>规则</h2><ul>
+<li>包含几个levels</li>
+<li>所有的key出现在level 1</li>
+<li>每个level是一个排序的链表</li>
+<li>如果key x出现在level i,那么它也会出现在所有小于i的level上</li>
+<li>在每个level上第一个元素是-inf，最大元素是+inf</li>
+<li>最顶层的第一个元素有个top指针</li>
+<li>最底层的元素 down-pointer=NULL</li>
+<li>counter维护着level数目</li>
 </ul>
-<h2 id="杀死哪个进程"><a href="#杀死哪个进程" class="headerlink" title="杀死哪个进程"></a>杀死哪个进程</h2><p>因为linux会给每个进程打分，打分最高的会被杀死。<br>可以看源码：<a href="https://github.com/torvalds/linux/blob/master/mm/oom_kill.c" target="_blank" rel="external">https://github.com/torvalds/linux/blob/master/mm/oom_kill.c</a></p>
-<pre><code>/**
- * oom_badness - heuristic function to determine which candidate task to kill
- * @p: task struct of which task we should calculate
- * @totalpages: total present RAM allowed for page allocation
- *
- * The heuristic for determining which task to kill is made to be as simple and
- * predictable as possible.  The goal is to return the highest value for the
- * task consuming the most memory to avoid subsequent oom failures.
- */
-unsigned long oom_badness(struct task_struct *p, struct mem_cgroup *memcg,
-              const nodemask_t *nodemask, unsigned long totalpages)
-{
-    long points;
-    long adj;
-
-    if (oom_unkillable_task(p, memcg, nodemask))
-        return 0;
-
-    p = find_lock_task_mm(p);
-    if (!p)
-        return 0;
-
-    /*
-     * Do not even consider tasks which are explicitly marked oom
-     * unkillable or have been already oom reaped or the are in
-     * the middle of vfork
-     */
-    adj = (long)p-&gt;signal-&gt;oom_score_adj;
-    if (adj == OOM_SCORE_ADJ_MIN ||
-            test_bit(MMF_OOM_SKIP, &amp;p-&gt;mm-&gt;flags) ||
-            in_vfork(p)) {
-        task_unlock(p);
-        return 0;
-    }
-
-    /*
-     * The baseline for the badness score is the proportion of RAM that each
-     * task&apos;s rss, pagetable and swap space use.
-     */
-    points = get_mm_rss(p-&gt;mm) + get_mm_counter(p-&gt;mm, MM_SWAPENTS) +
-        atomic_long_read(&amp;p-&gt;mm-&gt;nr_ptes) + mm_nr_pmds(p-&gt;mm);
-    task_unlock(p);
-
-    /*
-     * Root processes get 3% bonus, just like the __vm_enough_memory()
-     * implementation used by LSMs.
-     */
-    if (has_capability_noaudit(p, CAP_SYS_ADMIN))
-        points -= (points * 3) / 100;
-
-    /* Normalize to oom_score_adj units */
-    adj *= totalpages / 1000;
-    points += adj;
-
-    /*
-     * Never return 0 for an eligible task regardless of the root bonus and
-     * oom_score_adj (oom_score_adj can&apos;t be OOM_SCORE_ADJ_MIN here).
-     */
-    return points &gt; 0 ? points : 1;
-}
-</code></pre><h2 id="日志查看"><a href="#日志查看" class="headerlink" title="日志查看"></a>日志查看</h2><ul>
-<li>egrep -i ‘killed process’ /var/log/messages 可以查看被杀死的进程，以及占用的内存</li>
-<li>cat /proc/[pid]/oom_abj 进程pid的权重</li>
-<li>cat /proc/[pid]/oom_score 进程pid的分数</li>
-<li><p>找出最有可能被oom killer杀掉的进程</p>
-<p>  #!/bin/bash<br>  for proc in $(find /proc -maxdepth 1 -regex ‘/proc/[0-9]+’); do</p>
-<pre><code>printf &quot;%2d %5d %s\n&quot; \
-    &quot;$(cat $proc/oom_score)&quot; \
-    &quot;$(basename $proc)&quot; \
-    &quot;$(cat $proc/cmdline | tr &apos;\0&apos; &apos; &apos; | head -c 50)&quot;
-</code></pre><p>  done 2&gt;/dev/null | sort -nr | head -n 10</p>
+<p><img src="https://raw.githubusercontent.com/buptlsy/images/gh-pages/skiplist1.png" alt="skiplist"></p>
+<h2 id="增删查操作"><a href="#增删查操作" class="headerlink" title="增删查操作"></a>增删查操作</h2><h3 id="查找"><a href="#查找" class="headerlink" title="查找"></a>查找</h3><p>查找x find(x)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">p = top;</div><div class="line"><span class="keyword">while</span> (<span class="number">1</span>) &#123;</div><div class="line">	<span class="keyword">while</span> (p.next.key &lt; x) p = p.next;</div><div class="line">	<span class="keyword">if</span> (p.down == <span class="keyword">null</span>) <span class="keyword">return</span> p;</div><div class="line">p = p.down;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/buptlsy/images/gh-pages/skiplist-find.png" alt="skiplist find"></p>
+<h3 id="插入一个新元素"><a href="#插入一个新元素" class="headerlink" title="插入一个新元素"></a>插入一个新元素</h3><p>插入x insert(x)</p>
+<ol>
+<li><p>确定K.level的值。如果k是比当前level的值大，就添加新的level，更新top和num_of_level的值。 用OurRnd()函数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">k=<span class="number">1</span>;</div><div class="line"><span class="keyword">while</span> (OurRnd() == <span class="number">1</span>) k++;</div></pre></td></tr></table></figure>
 </li>
-</ul>
-
+<li><p>找到要插入的位置。</p>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/buptlsy/images/gh-pages/skiplist-insert.png" alt="skiplist insert"></p>
+<h3 id="删除元素x"><a href="#删除元素x" class="headerlink" title="删除元素x"></a>删除元素x</h3><ol>
+<li>先find(x)找到位置</li>
+<li>在find的过程中，使用链表的删除操作删除每个level的参与者</li>
+<li>如果一个或者更多的level变成空，删除他们。更新top和num_of_level</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/buptlsy/images/gh-pages/skiplist-delete.png" alt="skiplist delete"></p>
+<h2 id="时间、空间复杂度"><a href="#时间、空间复杂度" class="headerlink" title="时间、空间复杂度"></a>时间、空间复杂度</h2><h3 id="SL的level值是O-logn"><a href="#SL的level值是O-logn" class="headerlink" title="SL的level值是O(logn)"></a>SL的level值是O(logn)</h3><p>n是key的数目。<br>证明：</p>
+<ol>
+<li>在最底层的元素数目是n</li>
+<li>因为每个元素加入level 2的可能性是1/2，所有这个在level 2期望的数目是n/2</li>
+<li>依次类推，每个元素加入level j的可能性是 pow(1/2, j-1),因此level j的元素数目是n*pow(1/2, j-1)</li>
+<li>因此在log(n) level时，没有元素剩下。</li>
+</ol>
+<h3 id="期望元素数目是O-n"><a href="#期望元素数目是O-n" class="headerlink" title="期望元素数目是O(n)"></a>期望元素数目是O(n)</h3><p>n是key的数目。<br>证明：</p>
+<ol>
+<li>按照上面的推理，这总共元素的数目是：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">n + n/2 + n/4 + n/8 + ... &lt;= n(1 + 1/2 + 1/4 + ...) = 2n</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="find-insert-delete操作时间复杂度是O-logn"><a href="#find-insert-delete操作时间复杂度是O-logn" class="headerlink" title="find/insert/delete操作时间复杂度是O(logn)"></a>find/insert/delete操作时间复杂度是O(logn)</h3>
       
     </div>
 
@@ -425,7 +390,7 @@ unsigned long oom_badness(struct task_struct *p, struct mem_cgroup *memcg,
       
         <div class="post-tags">
           
-            <a href="/tags/linux/" rel="tag">#linux</a>
+            <a href="/tags/algorithm/" rel="tag">#algorithm</a>
           
         </div>
       
@@ -434,17 +399,13 @@ unsigned long oom_badness(struct task_struct *p, struct mem_cgroup *memcg,
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/10/25/zkBaseOperation/" rel="next" title="zk的基本操作">
-                <i class="fa fa-chevron-left"></i> zk的基本操作
+              <a href="/2017/04/24/spring aop事务/" rel="next" title="spring 事务类内部调用不生效的问题">
+                <i class="fa fa-chevron-left"></i> spring 事务类内部调用不生效的问题
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/01/08/flume-hbase/" rel="prev" title="flume 写入hbase配置及原理">
-                flume 写入hbase配置及原理 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -470,8 +431,8 @@ unsigned long oom_badness(struct task_struct *p, struct mem_cgroup *memcg,
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/11/24/linux oom killer的那些事/"
-           data-title="linux oom killer的那些事" data-url="http://yoursite.com/2016/11/24/linux oom killer的那些事/">
+      <div class="ds-thread" data-thread-key="2017/07/09/skiplist/"
+           data-title="skiplist[译]" data-url="http://yoursite.com/2017/07/09/skiplist/">
       </div>
     
   </div>
@@ -562,7 +523,7 @@ unsigned long oom_badness(struct task_struct *p, struct mem_cgroup *memcg,
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#oom-killer的触发条件"><span class="nav-number">1.</span> <span class="nav-text">oom killer的触发条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#杀死哪个进程"><span class="nav-number">2.</span> <span class="nav-text">杀死哪个进程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志查看"><span class="nav-number">3.</span> <span class="nav-text">日志查看</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#规则"><span class="nav-number">1.</span> <span class="nav-text">规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增删查操作"><span class="nav-number">2.</span> <span class="nav-text">增删查操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查找"><span class="nav-number">2.1.</span> <span class="nav-text">查找</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插入一个新元素"><span class="nav-number">2.2.</span> <span class="nav-text">插入一个新元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除元素x"><span class="nav-number">2.3.</span> <span class="nav-text">删除元素x</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#时间、空间复杂度"><span class="nav-number">3.</span> <span class="nav-text">时间、空间复杂度</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SL的level值是O-logn"><span class="nav-number">3.1.</span> <span class="nav-text">SL的level值是O(logn)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#期望元素数目是O-n"><span class="nav-number">3.2.</span> <span class="nav-text">期望元素数目是O(n)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#find-insert-delete操作时间复杂度是O-logn"><span class="nav-number">3.3.</span> <span class="nav-text">find/insert/delete操作时间复杂度是O(logn)</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
